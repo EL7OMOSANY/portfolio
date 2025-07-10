@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohmmed Ayman - Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom styles to ensure Inter font is applied and provide a base */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa; /* Light background */
+            color: #343a40; /* Dark text */
+            line-height: 1.7; /* Slightly increased line height for readability */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        /* Smooth scroll for navigation */
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Custom scrollbar for a nicer look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Keyframes for subtle background animation on hero */
+        @keyframes heroBackgroundPan {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .hero-bg-animated {
+            background-size: 200% 200%;
+            animation: heroBackgroundPan 25s ease infinite; /* Slower animation */
+        }
+
+        /* Custom overlay for portfolio items */
+        .portfolio-item-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%; /* Covers the image part */
+            background: rgba(0, 0, 0, 0.75); /* Slightly darker overlay */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.4s ease; /* Slower transition */
+            border-radius: 0.75rem; /* Match parent rounded-xl */
+            padding: 1.5rem; /* Increased padding for text */
+            box-sizing: border-box; /* Include padding in width/height */
+        }
+        .portfolio-item .relative:hover .portfolio-item-overlay { /* Apply overlay on image hover */
+            opacity: 1;
+        }
+        .portfolio-item-overlay h3 {
+            font-size: 1.75rem; /* Larger title */
+            font-weight: 800; /* Bolder */
+            margin-bottom: 0.75rem; /* More space */
+            text-align: center;
+            line-height: 1.2;
+        }
+        .portfolio-item-overlay p {
+            font-size: 1.1rem; /* Larger description */
+            text-align: center;
+            padding: 0 1rem;
+            margin-bottom: 1.5rem; /* More space before button */
+        }
+
+        /* Custom animation for section titles */
+        .section-title-animate {
+            animation-delay: 0.2s;
+        }
+
+        /* Custom animation for section content */
+        .section-content-animate {
+            animation-delay: 0.4s;
+        }
+
+        /* Custom animation for grid/list items */
+        .item-animate {
+            animation-delay: var(--animation-delay, 0s);
+        }
+
+        /* Two-color headline styling */
+        .headline-primary {
+            color: #343a40; /* Dark text for most of the headline */
+        }
+        .headline-accent {
+            color: #EF4444; /* Red accent color for keywords */
+        }
+        .body-accent {
+            color: #10B981; /* Green accent for body text keywords */
+            font-weight: 600;
+        }
+
+        /* Skill item specific styles for hover effect */
+        .skill-item {
+            position: relative;
+            transition: background 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow for smoother transition */
+            overflow: hidden; /* Important for the .skill-item-bg-fade */
+        }
+        .skill-item:hover {
+            transform: translateY(-8px) scale(1.03);
+        }
+        .skill-item-bg-fade {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(173, 216, 230, 0.7) 0%, transparent 70%); /* Default fade color */
+            transform: translate(-50%, -50%) scale(0);
+            transition: all 0.3s ease-out;
+            opacity: 0;
+            z-index: 0;
+        }
+        .skill-item:hover .skill-item-bg-fade {
+            width: 200%;
+            height: 200%;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Project item hover effect */
+        .portfolio-item:hover {
+            transform: scale(1.02); /* Slightly enlarge the card */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* More prominent shadow */
+        }
+
+        /* Modal specific styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 90%;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            position: relative;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.2s ease;
+        }
+        .modal-close-button:hover {
+            color: #333;
+        }
+        .modal-loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3B82F6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="main-header" class="bg-transparent text-white p-4 fixed w-full z-50 transition-all duration-300">
+        <nav class="container mx-auto flex justify-between items-center">
+            <div class="text-3xl font-extrabold rounded-md hover:text-yellow-300 transition duration-300">
+                <a href="#" class="focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded-md">Mohmmed Ayman</a>
+            </div>
+            <ul class="flex space-x-6 text-lg">
+                <li><a href="#about" class="hover:text-yellow-300 transition duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded-md p-2">About</a></li>
+                <li><a href="#skills" class="hover:text-yellow-300 transition duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded-md p-2">Skills</a></li>
+                <li><a href="#experience" class="hover:text-yellow-300 transition duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded-md p-2">Experience</a></li>
+                <li><a href="#portfolio" class="hover:text-yellow-300 transition duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded-md p-2">Projects</a></li>
+                <li><a href="#contact" class="hover:text-yellow-300 transition duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded-md p-2">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="hero" class="relative bg-gradient-to-br from-blue-700 via-purple-700 to-pink-700 text-white py-32 md:py-48 flex items-center justify-center min-h-screen hero-bg-animated overflow-hidden">
+        <div class="absolute inset-0 bg-black opacity-50 z-0"></div> <div class="container mx-auto text-center relative z-10 flex flex-col md:flex-row items-center justify-center px-4">
+            <div class="md:w-1/2 text-center md:text-left animate__animated animate__fadeInLeft animate__delay-1s">
+                <p class="text-2xl md:text-3xl font-light mb-4 drop-shadow-md">Hello, I'm</p>
+                <h1 class="text-6xl md:text-8xl font-extrabold leading-tight mb-4 drop-shadow-lg">
+                    Mohmmed <span class="text-yellow-300">Ayman</span>
+                </h1>
+                <p class="text-2xl md:text-3xl mb-8 drop-shadow-md">
+                    A passionate <span class="font-bold text-yellow-300">Flutter Mobile App Developer</span>
+                </p>
+                <a href="#portfolio" class="inline-block bg-yellow-400 text-gray-900 font-bold py-4 px-10 rounded-full shadow-lg hover:bg-yellow-300 hover:scale-105 transition duration-300 transform focus:outline-none focus:ring-4 focus:ring-yellow-500 focus:ring-opacity-50 text-xl">
+                    View My Projects <i class="fas fa-arrow-right ml-3"></i>
+                </a>
+            </div>
+            <div class="md:w-1/2 mt-10 md:mt-0 flex justify-center animate__animated animate__fadeInRight animate__delay-1s">
+                <img src="https://media.istockphoto.com/id/1550525760/photo/portrait-smile-and-asian-man-with-arms-crossed-casual-fashion-and-confident-guy-against-a.jpg?s=612x612&w=0&k=20&c=17b0FkrnggtvKbj-3uBQOyfsWlV9C3RvFBOMDfDv3hQ=" class="w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-white transform hover:scale-105 transition-transform duration-300">
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-24 bg-gradient-to-br from-white to-blue-50 shadow-inner">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-5xl font-extrabold mb-12 headline-primary animate__animated animate__fadeInUp section-title-animate">
+                <span class="headline-accent">About</span> Me
+            </h2>
+            <div class="max-w-4xl mx-auto leading-relaxed text-xl text-gray-700 animate__animated animate__fadeInUp section-content-animate">
+                <p class="mb-6">
+                    Results-driven <span class="body-accent">Mobile App Developer</span> specializing in <span class="body-accent">Flutter</span>. I build high-performance, scalable, and responsive applications using clean architecture and modern state management (Provider, Bloc/Cubit).
+                </p>
+                <p>
+                    Proficient in <span class="body-accent">Firebase</span>, <span class="body-accent">API integration</span>, Git workflows, UI/UX optimization, app localization, and local storage. I'm eager to deliver user-centric features through collaboration and continuous improvement.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="py-24 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-5xl font-extrabold mb-12 headline-primary animate__animated animate__fadeInUp section-title-animate">
+                Technical <span class="headline-accent">Skills</span>
+            </h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-10 max-w-5xl mx-auto">
+                <div class="skill-item relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-3 transition duration-300 animate__animated animate__zoomIn item-animate group overflow-hidden">
+                    <div class="skill-item-bg-fade"></div>
+                    <div class="relative z-10">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg" alt="Flutter" class="w-24 h-24 mx-auto mb-4">
+                        <h3 class="text-2xl font-semibold text-gray-800">Flutter</h3>
+                    </div>
+                </div>
+                <div class="skill-item relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-3 transition duration-300 animate__animated animate__zoomIn item-animate group overflow-hidden" style="--animation-delay: 0.1s;">
+                    <div class="skill-item-bg-fade"></div>
+                    <div class="relative z-10">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dart/dart-original.svg" alt="Dart" class="w-24 h-24 mx-auto mb-4">
+                        <h3 class="text-2xl font-semibold text-gray-800">State Management</h3>
+                    </div>
+                </div>
+                <div class="skill-item relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-3 transition duration-300 animate__animated animate__zoomIn item-animate group overflow-hidden" style="--animation-delay: 0.2s;">
+                    <div class="skill-item-bg-fade"></div>
+                    <div class="relative z-10">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg" alt="Firebase" class="w-24 h-24 mx-auto mb-4">
+                        <h3 class="text-2xl font-semibold text-gray-800">Firebase</h3>
+                    </div>
+                </div>
+                <div class="skill-item relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-3 transition duration-300 animate__animated animate__zoomIn item-animate group overflow-hidden" style="--animation-delay: 0.3s;">
+                    <div class="skill-item-bg-fade"></div>
+                    <div class="relative z-10">
+                        <i class="fas fa-code-branch text-blue-600 text-7xl mx-auto mb-4"></i>
+                        <h3 class="text-2xl font-semibold text-gray-800">API Integration</h3>
+                    </div>
+                </div>
+                <div class="skill-item relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-3 transition duration-300 animate__animated animate__zoomIn item-animate group overflow-hidden" style="--animation-delay: 0.4s;">
+                    <div class="skill-item-bg-fade"></div>
+                    <div class="relative z-10">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" class="w-24 h-24 mx-auto mb-4">
+                        <h3 class="text-2xl font-semibold text-gray-800">Git / GitHub</h3>
+                    </div>
+                </div>
+                <div class="skill-item relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-3 transition duration-300 animate__animated animate__zoomIn item-animate group overflow-hidden" style="--animation-delay: 0.5s;">
+                    <div class="skill-item-bg-fade"></div>
+                    <div class="relative z-10">
+                        <i class="fas fa-mobile-alt text-green-600 text-7xl mx-auto mb-4"></i>
+                        <h3 class="text-2xl font-semibold text-gray-800">Responsive Design</h3>
+                    </div>
+                </div>
+                <div class="skill-item relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-3 transition duration-300 animate__animated animate__zoomIn item-animate group overflow-hidden" style="--animation-delay: 0.6s;">
+                    <div class="skill-item-bg-fade"></div>
+                    <div class="relative z-10">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma" class="w-24 h-24 mx-auto mb-4">
+                        <h3 class="text-2xl font-semibold text-gray-800">Figma</h3>
+                    </div>
+                </div>
+                <div class="skill-item relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-3 transition duration-300 animate__animated animate__zoomIn item-animate group overflow-hidden" style="--animation-delay: 0.7s;">
+                    <div class="skill-item-bg-fade"></div>
+                    <div class="relative z-10">
+                        <i class="fas fa-globe text-purple-600 text-7xl mx-auto mb-4"></i>
+                        <h3 class="text-2xl font-semibold text-gray-800">App Localization</h3>
+                    </div>
+                </div>
+                <div class="skill-item relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-3 transition duration-300 animate__animated animate__zoomIn item-animate group overflow-hidden" style="--animation-delay: 0.8s;">
+                    <div class="skill-item-bg-fade"></div>
+                    <div class="relative z-10">
+                        <i class="fas fa-database text-red-600 text-7xl mx-auto mb-4"></i>
+                        <h3 class="text-2xl font-semibold text-gray-800">Local DB</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="py-24 bg-gradient-to-br from-white to-blue-50 shadow-inner">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-5xl font-extrabold mb-12 headline-primary animate__animated animate__fadeInUp section-title-animate">
+                <span class="headline-accent">Experience</span>
+            </h2>
+            <div class="max-w-4xl mx-auto text-left space-y-12">
+                <div class="bg-gray-50 p-8 rounded-xl shadow-lg animate__animated animate__fadeInUp item-animate" style="--animation-delay: 0s;">
+                    <h3 class="text-3xl font-semibold text-gray-800 mb-3">Freelance Flutter Developer</h3>
+                    <p class="text-xl text-gray-600 italic mb-5">Jan 2023 – Present</p>
+                    <ul class="list-disc list-inside text-xl text-gray-700 space-y-3">
+                        <li>Developed custom mobile applications for clients using <span class="body-accent">Flutter</span> and <span class="body-accent">Firebase</span>.</li>
+                        <li>Designed clean and responsive UIs.</li>
+                        <li>Integrated APIs and managed state effectively.</li>
+                        <li>Communicated with clients to gather requirements and provide updates.</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-50 p-8 rounded-xl shadow-lg animate__animated animate__fadeInUp item-animate" style="--animation-delay: 0.1s;">
+                    <h3 class="text-3xl font-semibold text-gray-800 mb-3">Open Source Contributor</h3>
+                    <p class="text-xl text-gray-600 italic mb-5">2022 – Present</p>
+                    <ul class="list-disc list-inside text-xl text-gray-700 space-y-3">
+                        <li>Contributed to <span class="body-accent">GitHub</span> for UI improvements and bug fixes.</li>
+                        <li>Practiced clean code principles and version control.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="education" class="py-24 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-5xl font-extrabold mb-12 headline-primary animate__animated animate__fadeInUp section-title-animate">
+                <span class="headline-accent">Education</span>
+            </h2>
+            <div class="max-w-4xl mx-auto text-left bg-white p-8 rounded-xl shadow-lg animate__animated animate__fadeInUp item-animate" style="--animation-delay: 0s;">
+                <h3 class="text-3xl font-semibold text-gray-800 mb-3">Tanta University – Faculty of Computer and Information Sciences</h3>
+                <p class="text-xl text-gray-600 italic mb-5">Bachelor’s Degree in Computer Science (Expected: 2026)</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="certifications" class="py-24 bg-gradient-to-br from-white to-blue-50 shadow-inner">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-5xl font-extrabold mb-12 headline-primary animate__animated animate__fadeInUp section-title-animate">
+                Certifications & <span class="headline-accent">Achievements</span>
+            </h2>
+            <div class="max-w-4xl mx-auto text-left space-y-12">
+                <div class="bg-gray-50 p-8 rounded-xl shadow-lg animate__animated animate__fadeInUp item-animate" style="--animation-delay: 0s;">
+                    <h3 class="text-3xl font-semibold text-gray-800 mb-3">NTI Mobile Applications Nanodegree</h3>
+                    <p class="text-xl text-gray-600 italic mb-5">Grade: 97%</p>
+                    <ul class="list-disc list-inside text-xl text-gray-700 space-y-3">
+                        <li>120 hours technical + 30 hours soft skills.</li>
+                        <li>Built 15+ <span class="body-accent">Flutter apps</span> (e.g., WhatsApp UI clone, News App, BMI App).</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-50 p-8 rounded-xl shadow-lg animate__animated animate__fadeInUp item-animate" style="--animation-delay: 0.1s;">
+                    <h3 class="text-3xl font-semibold text-gray-800 mb-3">Programming Competitions</h3>
+                    <ul class="list-disc list-inside text-xl text-gray-700 space-y-3">
+                        <li>6th place – <span class="body-accent">ECPC Team Round</span></li>
+                        <li>5th place – <span class="body-accent">ICPC Tanta Final Round (Solo)</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="portfolio" class="py-24 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-5xl font-extrabold mb-12 headline-primary animate__animated animate__fadeInUp section-title-animate">
+                <span class="headline-accent">Projects</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
+                <div class="portfolio-item bg-white rounded-xl shadow-lg overflow-hidden group transition-transform duration-300 animate__animated animate__fadeInUp item-animate" style="--animation-delay: 0s;">
+                    <div class="relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="MediBuddy Project - Health Monitoring" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110">
+                        <div class="portfolio-item-overlay">
+                            <p>AI-based health monitoring platform offering health insights.</p>
+                            <a href="#" target="_blank" class="inline-block bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-full hover:bg-yellow-300 transition duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 text-lg mt-4">
+                                View Project
+                            </a>
+                        </div>
+                    </div>
+                    <div class="p-6 text-left">
+                        <h3 class="text-2xl font-semibold text-gray-800">MediBuddy</h3>
+                    </div>
+                </div>
+                <div class="portfolio-item bg-white rounded-xl shadow-lg overflow-hidden group transition-transform duration-300 animate__animated animate__fadeInUp item-animate" style="--animation-delay: 0.1s;">
+                    <div class="relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=600&q=80" alt="BookyApp Project - Book Browse" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110">
+                        <div class="portfolio-item-overlay">
+                            <p>App for Browse books by category with search functionality.</p>
+                            <a href="#" target="_blank" class="inline-block bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-full hover:bg-yellow-300 transition duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 text-lg mt-4">
+                                View Project
+                            </a>
+                        </div>
+                    </div>
+                    <div class="p-6 text-left">
+                        <h3 class="text-2xl font-semibold text-gray-800">BookyApp</h3>
+                    </div>
+                </div>
+                <div class="portfolio-item bg-white rounded-xl shadow-lg overflow-hidden group transition-transform duration-300 animate__animated animate__fadeInUp item-animate" style="--animation-delay: 0.2s;">
+                    <div class="relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80" alt="Al-Moslem Project - Islamic App" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110">
+                        <div class="portfolio-item-overlay">
+                            <p>Islamic app with Quran, Hadiths, Tasbeeh, and supplications.</p>
+                            <a href="#" target="_blank" class="inline-block bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-full hover:bg-yellow-300 transition duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 text-lg mt-4">
+                                View Project
+                            </a>
+                        </div>
+                    </div>
+                    <div class="p-6 text-left">
+                        <h3 class="text-2xl font-semibold text-gray-800">Al-Moslem</h3>
+                    </div>
+                </div>
+                <div class="portfolio-item bg-white rounded-xl shadow-lg overflow-hidden group transition-transform duration-300 animate__animated animate__fadeInUp item-animate" style="--animation-delay: 0.3s;">
+                    <div class="relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=600&q=80" alt="TaskyApp Project - Task Management" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110">
+                        <div class="portfolio-item-overlay">
+                            <p>App to make and manage Tasks with priority.</p>
+                            <a href="#" target="_blank" class="inline-block bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-full hover:bg-yellow-300 transition duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 text-lg mt-4">
+                                View Project
+                            </a>
+                        </div>
+                    </div>
+                    <div class="p-6 text-left">
+                        <h3 class="text-2xl font-semibold text-gray-800">TaskyApp</h3>
+                    </div>
+                </div>
+                <div class="portfolio-item bg-white rounded-xl shadow-lg overflow-hidden group transition-transform duration-300 animate__animated animate__fadeInUp item-animate" style="--animation-delay: 0.4s;">
+                    <div class="relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&fit=crop&w=600&q=80" alt="ChatApp Project - Chat Platform" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110">
+                        <div class="portfolio-item-overlay">
+                            <p>One-way chat platform with Firebase authentication and data storage.</p>
+                            <a href="#" target="_blank" class="inline-block bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-full hover:bg-yellow-300 transition duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 text-lg mt-4">
+                                View Project
+                            </a>
+                        </div>
+                    </div>
+                    <div class="p-6 text-left">
+                        <h3 class="text-2xl font-semibold text-gray-800">ChatApp</h3>
+                    </div>
+                </div>
+                <div class="portfolio-item bg-white rounded-xl shadow-lg overflow-hidden group transition-transform duration-300 animate__animated animate__fadeInUp item-animate" style="--animation-delay: 0.5s;">
+                    <div class="relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80" alt="NewsApp Project - News Feed" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110">
+                        <div class="portfolio-item-overlay">
+                            <p>News aggregator with filterable categories and detailed content display.</p>
+                            <a href="#" target="_blank" class="inline-block bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-full hover:bg-yellow-300 transition duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 text-lg mt-4">
+                                View Project
+                            </a>
+                        </div>
+                    </div>
+                    <div class="p-6 text-left">
+                        <h3 class="text-2xl font-semibold text-gray-800">NewsApp</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-24 bg-gradient-to-br from-white to-blue-50">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-5xl font-extrabold mb-12 headline-primary animate__animated animate__fadeInUp section-title-animate">
+                Get In <span class="headline-accent">Touch</span>
+            </h2>
+            <p class="text-xl text-gray-700 mb-12 animate__animated animate__fadeInUp section-content-animate">
+                Have a project in mind or just want to say hello? Feel free to reach out!
+            </p>
+            <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 text-left mb-12">
+                <div class="bg-gray-50 p-8 rounded-xl shadow-lg animate__animated animate__fadeInLeft item-animate" style="--animation-delay: 0s;">
+                    <h3 class="text-3xl font-semibold text-gray-800 mb-4">Contact Info</h3>
+                    <ul class="space-y-4 text-xl text-gray-700">
+                        <li><i class="fas fa-map-marker-alt text-blue-600 mr-3"></i> Tanta, Gharbia, Egypt</li>
+                        <li><i class="fas fa-phone-alt text-blue-600 mr-3"></i> <a href="tel:+201024324732" class="hover:underline">+20 1024324732</a></li>
+                        <li><i class="fas fa-envelope text-blue-600 mr-3"></i> <a href="mailto:mmohmmeayman710@gmail.com" class="hover:underline">mmohmmeayman710@gmail.com</a></li>
+                        <li><i class="fab fa-linkedin text-blue-600 mr-3"></i> <a href="https://www.linkedin.com/in/mohmmed-ayman-b9080b34a" target="_blank" class="hover:underline">LinkedIn Profile</a></li>
+                        <li><i class="fab fa-github text-blue-600 mr-3"></i> <a href="https://github.com/EL7OMOSANY" target="_blank" class="hover:underline">GitHub Profile</a></li>
+                    </ul>
+                </div>
+                <form class="bg-gray-50 p-8 rounded-xl shadow-lg animate__animated animate__fadeInRight item-animate" style="--animation-delay: 0.1s;">
+                    <h3 class="text-3xl font-semibold text-gray-800 mb-4">Send a Message</h3>
+                    <div class="mb-6">
+                        <input type="text" id="name" name="name" placeholder="Your Name" class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-lg" required>
+                    </div>
+                    <div class="mb-6">
+                        <input type="email" id="email" name="email" placeholder="Your Email" class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-lg" required>
+                    </div>
+                    <div class="mb-6">
+                        <textarea id="message" name="message" rows="6" placeholder="Your Message" class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-lg" required></textarea>
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white font-bold py-4 px-10 rounded-full hover:bg-blue-700 transition duration-300 transform hover:scale-105 shadow-md focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-xl">
+                        Send Message
+                    </button>
+                </form>
+            </div>
+            <div id="message-box" class="hidden mt-6 p-4 bg-green-100 text-green-800 rounded-lg shadow-md max-w-md mx-auto animate__animated animate__fadeIn">
+                Your message has been sent successfully!
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white py-10 text-center">
+        <div class="container mx-auto px-4">
+            <p class="text-lg">&copy; 2025 Mohammed Ayman Hamed. All rights reserved.</p>
+            <div class="flex justify-center space-x-8 mt-6">
+                <a href="https://www.linkedin.com/in/mohmmed-ayman-b9080b34a" target="_blank" class="text-gray-400 hover:text-white transition duration-300 transform hover:scale-125" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin-in text-3xl"></i>
+                </a>
+                <a href="https://github.com/EL7OMOSANY" target="_blank" class="text-gray-400 hover:text-white transition duration-300 transform hover:scale-125" aria-label="GitHub">
+                    <i class="fab fa-github text-3xl"></i>
+                </a>
+                <a href="mailto:mmohmmeayman710@gmail.com" class="text-gray-400 hover:text-white transition duration-300 transform hover:scale-125" aria-label="Email">
+                    <i class="fas fa-envelope text-3xl"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="description-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" id="close-modal-btn">&times;</button>
+            <h3 class="text-3xl font-bold text-gray-800 mb-4">الوصف المحسّن للمشروع</h3>
+            <div id="enhanced-description-text" class="text-lg text-gray-700 mb-4 leading-relaxed">
+                </div>
+            <div id="loading-spinner" class="modal-loading-spinner hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav ul li a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent default anchor click behavior
+
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    // Scroll to the target element smoothly
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Header scroll effect (change background on scroll)
+        const mainHeader = document.getElementById('main-header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) { // Adjust scroll threshold as needed
+                mainHeader.classList.remove('bg-transparent');
+                mainHeader.classList.add('bg-gradient-to-r', 'from-blue-700', 'to-purple-700', 'shadow-lg');
+            } else {
+                mainHeader.classList.remove('bg-gradient-to-r', 'from-blue-700', 'to-purple-700', 'shadow-lg');
+                mainHeader.classList.add('bg-transparent');
+            }
+        });
+
+        // Animate elements on scroll using Intersection Observer for better performance
+        const animateOnScroll = (entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Animate section titles
+                    const title = entry.target.querySelector('h2');
+                    if (title) {
+                        title.classList.add('animate__animated', 'animate__fadeInUp', 'section-title-animate');
+                    }
+
+                    // Animate direct content under sections
+                    const directContentSelectors = [
+                        '.max-w-4xl.mx-auto.leading-relaxed.text-xl.text-gray-700', // About section text
+                        '#education > div > div', // Education content
+                        '#languages > div > div', // Languages content
+                        '#contact .max-w-3xl.mx-auto.grid.grid-cols-1.md\\:grid-cols-2.gap-10.text-left.mb-12 > div' // Contact info/form
+                    ];
+                    directContentSelectors.forEach(selector => {
+                        const elements = entry.target.querySelectorAll(selector);
+                        elements.forEach(el => {
+                            el.classList.add('animate__animated', 'animate__fadeInUp', 'section-content-animate');
+                        });
+                    });
+
+                    // Staggered animation for grid items (skills, portfolio, soft skills)
+                    entry.target.querySelectorAll('.skill-item, .portfolio-item, #soft-skills > div > div').forEach((item, index) => {
+                        item.classList.add('animate__animated', 'animate__fadeInUp', 'item-animate');
+                        // Use zoomIn for skill items specifically
+                        if (item.classList.contains('skill-item')) {
+                            item.classList.remove('animate__fadeInUp');
+                            item.classList.add('animate__zoomIn');
+                        }
+                        item.style.setProperty('--animation-delay', `${0.1 * index}s`); // Use CSS variable for delay
+                    });
+
+                    // Staggered animation for list items (experience, certifications)
+                    entry.target.querySelectorAll('#experience > div > div, #certifications > div > div').forEach((item, index) => {
+                        item.classList.add('animate__animated', 'animate__fadeInUp', 'item-animate');
+                        item.style.setProperty('--animation-delay', `${0.1 * index}s`); // Use CSS variable for delay
+                    });
+
+                    observer.unobserve(entry.target); // Stop observing once animated
+                }
+            });
+        };
+
+        // Create an Intersection Observer instance
+        const observer = new IntersectionObserver(animateOnScroll, {
+            root: null, // Use the viewport as the root
+            threshold: 0.1 // Trigger when 10% of the element is visible
+        });
+
+        // Observe all sections for animation
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+
+        // Handle form submission (client-side only for this example)
+        const contactForm = document.querySelector('#contact form');
+        const messageBox = document.getElementById('message-box');
+
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent actual form submission
+
+                // In a real application, you would send this data to a backend server
+                console.log('Form submitted!');
+                console.log('Name:', document.getElementById('name').value);
+                console.log('Email:', document.getElementById('email').value);
+                console.log('Message:', document.getElementById('message').value);
+
+                // Show the message box
+                messageBox.classList.remove('hidden');
+                messageBox.classList.add('animate__fadeIn');
+
+                // Hide the message box after a few seconds
+                setTimeout(() => {
+                    messageBox.classList.remove('animate__fadeIn');
+                    messageBox.classList.add('animate__fadeOut');
+                    setTimeout(() => {
+                        messageBox.classList.add('hidden');
+                        messageBox.classList.remove('animate__fadeOut');
+                    }, 500); // Match fadeOut animation duration
+                }, 3000);
+
+                contactForm.reset(); // Clear the form fields
+            });
+        }
+
+        // --- Dynamic focus/blur color effect for form fields ---
+        const formFields = document.querySelectorAll('#contact input[type="text"], #contact input[type="email"], #contact textarea');
+        const focusColors = [
+            'ring-blue-500', 'ring-green-500', 'ring-purple-500', 'ring-yellow-500', 'ring-pink-500', 'ring-indigo-500'
+        ];
+
+        formFields.forEach(field => {
+            field.addEventListener('focus', () => {
+                // Remove all existing ring classes first
+                focusColors.forEach(color => field.classList.remove(color));
+                field.classList.remove('ring-2', 'ring-offset-2');
+
+                // Add base ring classes
+                field.classList.add('ring-2', 'ring-offset-2');
+
+                // Pick a random color
+                const randomColor = focusColors[Math.floor(Math.random() * focusColors.length)];
+                field.classList.add(randomColor);
+            });
+
+            field.addEventListener('blur', () => {
+                // Remove all dynamic ring classes on blur
+                focusColors.forEach(color => field.classList.remove(color));
+                field.classList.remove('ring-2', 'ring-offset-2');
+                // Revert to default border if needed, or just let Tailwind's default handle it
+                field.classList.add('border-gray-300'); // Ensure default border is present
+            });
+        });
+
+        // --- Gemini API Integration: Project Description Enhancer ---
+        const descriptionModal = document.getElementById('description-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const enhancedDescriptionText = document.getElementById('enhanced-description-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        // Removed the enhanceButtons query as the button is removed from HTML
+        // const enhanceButtons = document.querySelectorAll('.enhance-description-btn');
+
+        // Function to open the modal
+        function openModal() {
+            descriptionModal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling background
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            descriptionModal.classList.remove('show');
+            document.body.style.overflow = ''; // Restore scrolling
+            enhancedDescriptionText.innerHTML = ''; // Clear content
+            loadingSpinner.classList.add('hidden'); // Hide spinner
+        }
+
+        // Event listener for closing modal
+        closeModalBtn.addEventListener('click', closeModal);
+        descriptionModal.addEventListener('click', (e) => {
+            if (e.target === descriptionModal) { // Close if clicked outside content
+                closeModal();
+            }
+        });
+
+        // Re-added event listeners for project view buttons to show modal (without AI enhancement)
+        // This part assumes you still want to show a modal with the description, just not AI-enhanced.
+        // If the modal is only for AI enhancement, this block can be removed.
+        document.querySelectorAll('.portfolio-item .inline-block.bg-yellow-400').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default link behavior
+                // For now, this button just links to the project. If you want a modal for project details,
+                // you'd need to populate it here. The AI enhancement button was removed.
+                window.open(button.href, '_blank'); // Open project link in new tab
+            });
+        });
+
+        // The Gemini API call logic is now unused since the button is removed.
+        // If you wish to re-integrate AI features in a different way,
+        // you would add new buttons/elements and link them to this API logic.
+
+        // --- Skill Item Hover Effect with Random Colors ---
+        const skillItems = document.querySelectorAll('.skill-item');
+        const colors = [
+            'linear-gradient(135deg, #facc15, #fbbf24)', // yellow-400, yellow-500
+            'linear-gradient(135deg, #34d399, #059669)', // green-400, green-600
+            'linear-gradient(135deg, #60a5fa, #2563eb)', // blue-400, blue-600
+            'linear-gradient(135deg, #f472b6, #db2777)', // pink-400, pink-600
+            'linear-gradient(135deg, #a78bfa, #7c3aed)', // purple-400, purple-600
+            'linear-gradient(135deg, #f87171, #dc2626)', // red-400, red-600
+            'linear-gradient(135deg, #38bdf8, #0ea5e9)', // light-blue-400, light-blue-600
+            'linear-gradient(135deg, #fcd34d, #fbbf24)'  // amber-300, amber-500
+        ];
+
+        skillItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                item.style.background = randomColor;
+                item.style.color = '#ffffff'; // Change text color to white on hover
+            });
+            item.addEventListener('mouseleave', () => {
+                item.style.background = '#ffffff'; // Revert to white background
+                item.style.color = '#343a40'; // Revert to default text color
+            });
+        });
+    </script>
+</body>
+</html>
